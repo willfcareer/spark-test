@@ -30,15 +30,21 @@ public class SimilarityTest {
     private static SparkSession spark = null;
     private static String splitTag = ",";
     public static Dataset<Row> tfidf(Dataset<Row> dataset) {
+        dataset.show();
         Tokenizer tokenizer = new Tokenizer().setInputCol("segment").setOutputCol("words");
         Dataset<Row> wordsData = tokenizer.transform(dataset);
+        wordsData.show();
         HashingTF hashingTF = new HashingTF()
                 .setInputCol("words")
                 .setOutputCol("rawFeatures");
+//                .setOutputCol("features");
         Dataset<Row> featurizedData = hashingTF.transform(wordsData);
+        featurizedData.show(false);
+//        if(true) return featurizedData;
         IDF idf = new IDF().setInputCol("rawFeatures").setOutputCol("features");
         IDFModel idfModel = idf.fit(featurizedData);
         Dataset<Row> rescaledData = idfModel.transform(featurizedData);
+        rescaledData.show(false);
         return rescaledData;
     }
 
